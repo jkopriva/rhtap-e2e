@@ -14,7 +14,7 @@ AUTH: gitlab
 ACS: new
 Registry: nexus
 TPA: new
-SCM: gitlab
+SCM: github
 Pipeline: tekton
 
 # Constraints
