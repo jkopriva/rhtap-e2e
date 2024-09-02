@@ -98,12 +98,12 @@ export class JenkinsCI extends Utils {
             }
             return response.status === 200;
         } catch (error) {
-            if (error.response && error.response.status === 404) {
-                return false;
-            } else {
+            // if (error.response && error.response.status === 404) {
+            //     return false;
+            // } else {
                 console.error('Error checking job existence:', error);
                 throw error;
-            }
+            //}
         }
     }
 
