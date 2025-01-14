@@ -288,7 +288,11 @@ export async function checkIfAcsScanIsPass(kubeClient: Kubernetes, repositoryNam
         return (result);
     }
     // Returns false when if condition not met
+<<<<<<< HEAD
     return false;
+=======
+    return false
+>>>>>>> 45c51d7 (RHTAP-3358 GitLab CI promotion pipeline)
 }
 
 export async function setSecretsForGitLabCI(gitLabProvider: GitLabProvider, gitlabRepositoryID: number, kubeClient: Kubernetes) {
@@ -301,12 +305,21 @@ export async function setSecretsForGitLabCI(gitLabProvider: GitLabProvider, gitl
     await gitLabProvider.setEnvironmentVariable(gitlabRepositoryID, "IMAGE_REGISTRY_USER", process.env.QUAY_USERNAME ?? '');
     await gitLabProvider.setEnvironmentVariable(gitlabRepositoryID, "ROX_API_TOKEN", await kubeClient.getACSToken(await getRHTAPRootNamespace()));
     await gitLabProvider.setEnvironmentVariable(gitlabRepositoryID, "ROX_CENTRAL_ENDPOINT", await kubeClient.getACSEndpoint(await getRHTAPRootNamespace()));
+<<<<<<< HEAD
+=======
+    await gitLabProvider.setEnvironmentVariable(gitlabRepositoryID, "TRUSTIFICATION_BOMBASTIC_API_URL", await kubeClient.getTTrustificationBombasticApiUrl(await getRHTAPRootNamespace()));
+    await gitLabProvider.setEnvironmentVariable(gitlabRepositoryID, "TRUSTIFICATION_OIDC_ISSUER_URL", await kubeClient.getTTrustificationOidcIssuerUrl(await getRHTAPRootNamespace()));
+    await gitLabProvider.setEnvironmentVariable(gitlabRepositoryID, "TRUSTIFICATION_OIDC_CLIENT_ID", await kubeClient.getTTrustificationClientId(await getRHTAPRootNamespace()));
+    await gitLabProvider.setEnvironmentVariable(gitlabRepositoryID, "TRUSTIFICATION_OIDC_CLIENT_SECRET", await kubeClient.getTTrustificationClientSecret(await getRHTAPRootNamespace()));
+    await gitLabProvider.setEnvironmentVariable(gitlabRepositoryID, "TRUSTIFICATION_SUPPORTED_CYCLONEDX_VERSION", await kubeClient.getTTrustificationSupportedCycloneDXVersion(await getRHTAPRootNamespace()));
+>>>>>>> 45c51d7 (RHTAP-3358 GitLab CI promotion pipeline)
 }
 
 export async function waitForGitLabCIPipelineToFinish(gitLabProvider: GitLabProvider, gitlabRepositoryID: number, pipelineRunNumber: number) {
     await gitLabProvider.waitForPipelinesToBeCreated(gitlabRepositoryID, pipelineRunNumber, 10000);
     const response = await gitLabProvider.getLatestPipeline(gitlabRepositoryID);
 
+<<<<<<< HEAD
     if(response?.id){
         const pipelineResult = await gitLabProvider.waitForPipelineToFinish(gitlabRepositoryID, response.id, 540000);
         expect(pipelineResult).toBe("success");
@@ -347,4 +360,8 @@ export async function verifySyftImagePath(kubeClient: Kubernetes, repositoryName
     }
     return result;
 
+=======
+    const pipelineResult = await gitLabProvider.waitForPipelineToFinish(gitlabRepositoryID, response!.id, 540000);
+    expect(pipelineResult).toBe("success");
+>>>>>>> 45c51d7 (RHTAP-3358 GitLab CI promotion pipeline)
 }
