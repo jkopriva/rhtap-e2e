@@ -6,6 +6,8 @@ import { JenkinsCI } from "../../src/apis/ci/jenkins";
 import { ScaffolderScaffoldOptions } from "@backstage/plugin-scaffolder-react";
 import { syncArgoApplication } from "./argocd";
 import { TaskIdReponse } from "../../src/apis/backstage/types";
+import { TrustificationClient } from "../../src/apis/trustification/trustification";
+
 
 export async function cleanAfterTestGitHub(gitHubClient: GitHubProvider, kubeClient: Kubernetes, rootNamespace: string, githubOrganization: string, repositoryName: string) {
     //Check, if gitops repo exists and delete
@@ -274,10 +276,21 @@ export async function waitForJenkinsJobToFinish(jenkinsClient: JenkinsCI, jobNam
  * @throws {Error} If the pipeline run cannot be found or if there is an error interacting with the Kubernetes API.
  * 
  */
+<<<<<<< HEAD
 export async function checkIfAcsScanIsPass(kubeClient: Kubernetes, repositoryName: string, developmentNamespace: string):Promise<boolean> {
     const pipelineRun = await kubeClient.getPipelineRunByRepository(repositoryName, 'push');
     if (pipelineRun?.metadata?.name) {
         const podName: string = pipelineRun.metadata.name + '-acs-image-scan-pod';
+=======
+export async function checkIfAcsScanIsPass(repositoryName: string, developmentNamespace: string):Promise<boolean> {
+    let kubeClient: Kubernetes;
+    kubeClient = new Kubernetes();
+    
+    const pipelineRun = await kubeClient.getPipelineRunByRepository(repositoryName, 'push')
+    if (pipelineRun?.metadata?.name) {
+        let podName: string = pipelineRun.metadata.name + '-acs-image-scan-pod'
+        
+>>>>>>> f7ebbca (RHTAP-2538 SBOM upload check)
         // Read the logs from the related container
         const podLogs: any = await kubeClient.readContainerLogs(podName, developmentNamespace, 'step-rox-image-scan');
         // Print the logs from the container 
@@ -364,4 +377,22 @@ export async function verifySyftImagePath(kubeClient: Kubernetes, repositoryName
     const pipelineResult = await gitLabProvider.waitForPipelineToFinish(gitlabRepositoryID, response!.id, 540000);
     expect(pipelineResult).toBe("success");
 >>>>>>> 45c51d7 (RHTAP-3358 GitLab CI promotion pipeline)
+}
+
+export async function checkSBOMInTrustification(kubeClient: Kubernetes, componentId: string) {
+    let trust: TrustificationClient;
+    const bombasticApiUrl = await kubeClient.getTTrustificationBombasticApiUrl(await getRHTAPRootNamespace());
+    const oidcIssuesUrl =await kubeClient.getTTrustificationOidcIssuerUrl(await getRHTAPRootNamespace()); 
+    const oidcclientId = await kubeClient.getTTrustificationClientId(await getRHTAPRootNamespace());
+    const oidcclientSecret = await kubeClient.getTTrustificationClientSecret(await getRHTAPRootNamespace());
+    
+    trust = new TrustificationClient(bombasticApiUrl, oidcIssuesUrl,oidcclientId, oidcclientSecret);
+
+    try {
+        await trust.initializeTpaToken();
+        const sbomData = await trust.waitForSbomSearchByName(componentId);
+        console.log('SBOM Data:', sbomData);
+    } catch (error) {
+        console.error('Error fetching SBOM data:', error);
+    }
 }
