@@ -357,7 +357,7 @@ export async function createTaskCreatorOptionsBitbucket(softwareTemplateName: st
 
 export async function waitForJenkinsJobToFinish(jenkinsClient: JenkinsCI, jobName: string, jobBuildNumber: number) {
     await new Promise(resolve => setTimeout(resolve, 5000));
-    const jobStatus = await jenkinsClient.waitForBuildToFinish(jobName, jobBuildNumber, 540000);
+    const jobStatus = await jenkinsClient.waitForJobToFinishInFolder(jobName, jobBuildNumber, 540000, jobName);
     expect(jobStatus).not.toBe(undefined);
     expect(jobStatus).toBe("SUCCESS");
 }
@@ -477,6 +477,7 @@ export async function checkSBOMInTrustification(kubeClient: Kubernetes, componen
     }
 }
 
+<<<<<<< HEAD
 export async function verifyPipelineRunByRepository(kubeClient: Kubernetes, repositoryName: string, developmentNamespace: string, eventType: string) {
     const pipelineRun = await kubeClient.getPipelineRunByRepository(repositoryName, eventType);
     let result = true;
@@ -498,4 +499,27 @@ export async function verifyPipelineRunByRepository(kubeClient: Kubernetes, repo
         }
     }
     return result;
+=======
+export async function setSecretsForJenkinsInFolder(jenkinsClient: JenkinsCI, kubeClient: Kubernetes, folderName: string, isGitLab = false) {
+    if (isGitLab){
+        await jenkinsClient.createCredentialsInFolder("GLOBAL", "GITOPS_AUTH_USERNAME", 'fakseUsername', folderName);
+        await jenkinsClient.createCredentialsInFolder("GLOBAL", "GITOPS_AUTH_PASSWORD", process.env.GITLAB_TOKEN ?? '', folderName);
+    } else {
+        await jenkinsClient.createCredentialsInFolder("GLOBAL", "GITOPS_AUTH_PASSWORD", process.env.GITHUB_TOKEN ?? '', folderName);
+    }
+    await jenkinsClient.createCredentialsInFolder("GLOBAL", "COSIGN_PUBLIC_KEY", process.env.COSIGN_PUBLIC_KEY ?? '', folderName);
+    await jenkinsClient.createCredentialsInFolder("GLOBAL", "COSIGN_SECRET_KEY", process.env.COSIGN_SECRET_KEY ?? '', folderName);
+    await jenkinsClient.createCredentialsInFolder("GLOBAL", "COSIGN_SECRET_PASSWORD", process.env.COSIGN_SECRET_PASSWORD ?? '', folderName);
+    await jenkinsClient.createCredentialsUsernamePasswordInFolder("GLOBAL", "QUAY_IO_CREDS", process.env.QUAY_USERNAME ?? '', process.env.QUAY_PASSWORD ?? '', folderName);
+    await jenkinsClient.createCredentialsInFolder("GLOBAL", "ROX_API_TOKEN", await kubeClient.getACSToken(await getRHTAPRootNamespace()), folderName);
+    await jenkinsClient.createCredentialsInFolder("GLOBAL", "ROX_CENTRAL_ENDPOINT", await kubeClient.getACSEndpoint(await getRHTAPRootNamespace()), folderName);
+}
+
+export async function setSecretsForJenkinsInFolderForTPA(jenkinsClient: JenkinsCI, kubeClient: Kubernetes, folderName: string) {
+    await jenkinsClient.createCredentialsInFolder("GLOBAL", "TRUSTIFICATION_BOMBASTIC_API_URL", await kubeClient.getTTrustificationBombasticApiUrl(await getRHTAPRootNamespace()), folderName);
+    await jenkinsClient.createCredentialsInFolder("GLOBAL", "TRUSTIFICATION_OIDC_ISSUER_URL", await kubeClient.getTTrustificationOidcIssuerUrl(await getRHTAPRootNamespace()), folderName);
+    await jenkinsClient.createCredentialsInFolder("GLOBAL", "TRUSTIFICATION_OIDC_CLIENT_ID", await kubeClient.getTTrustificationClientId(await getRHTAPRootNamespace()), folderName);
+    await jenkinsClient.createCredentialsInFolder("GLOBAL", "TRUSTIFICATION_OIDC_CLIENT_SECRET", await kubeClient.getTTrustificationClientSecret(await getRHTAPRootNamespace()), folderName);
+    await jenkinsClient.createCredentialsInFolder("GLOBAL", "TRUSTIFICATION_SUPPORTED_CYCLONEDX_VERSION", await kubeClient.getTTrustificationSupportedCycloneDXVersion(await getRHTAPRootNamespace()), folderName);
+>>>>>>> 2628f35 (RHTAP-4052 Reworked tests to use folder scope creds, instead of global)
 }
