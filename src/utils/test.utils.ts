@@ -477,7 +477,6 @@ export async function checkSBOMInTrustification(kubeClient: Kubernetes, componen
     }
 }
 
-<<<<<<< HEAD
 export async function verifyPipelineRunByRepository(kubeClient: Kubernetes, repositoryName: string, developmentNamespace: string, eventType: string) {
     const pipelineRun = await kubeClient.getPipelineRunByRepository(repositoryName, eventType);
     let result = true;
@@ -499,7 +498,8 @@ export async function verifyPipelineRunByRepository(kubeClient: Kubernetes, repo
         }
     }
     return result;
-=======
+}
+
 export async function setSecretsForJenkinsInFolder(jenkinsClient: JenkinsCI, kubeClient: Kubernetes, folderName: string, isGitLab = false) {
     if (isGitLab){
         await jenkinsClient.createCredentialsInFolder("GLOBAL", "GITOPS_AUTH_USERNAME", 'fakseUsername', folderName);
@@ -521,5 +521,4 @@ export async function setSecretsForJenkinsInFolderForTPA(jenkinsClient: JenkinsC
     await jenkinsClient.createCredentialsInFolder("GLOBAL", "TRUSTIFICATION_OIDC_CLIENT_ID", await kubeClient.getTTrustificationClientId(await getRHTAPRootNamespace()), folderName);
     await jenkinsClient.createCredentialsInFolder("GLOBAL", "TRUSTIFICATION_OIDC_CLIENT_SECRET", await kubeClient.getTTrustificationClientSecret(await getRHTAPRootNamespace()), folderName);
     await jenkinsClient.createCredentialsInFolder("GLOBAL", "TRUSTIFICATION_SUPPORTED_CYCLONEDX_VERSION", await kubeClient.getTTrustificationSupportedCycloneDXVersion(await getRHTAPRootNamespace()), folderName);
->>>>>>> 2628f35 (RHTAP-4052 Reworked tests to use folder scope creds, instead of global)
 }
