@@ -128,7 +128,9 @@ export const gitLabJenkinsBasicTests = (softwareTemplateName: string, stringOnRo
             await jenkinsClient.buildJenkinsJobInFolder(repositoryName, repositoryName);
             console.log('Waiting for the build to start...');
             await new Promise(resolve => setTimeout(resolve, 5000));
-            await jenkinsClient.waitForJobToFinishInFolder(repositoryName, 1, 540000, repositoryName);
+            const jobStatus = await jenkinsClient.waitForJobToFinishInFolder(repositoryName, 1, 540000, repositoryName);
+            expect(jobStatus).not.toBe(undefined);
+            expect(jobStatus).toBe("SUCCESS");
         }, 600000);
 
         /**
@@ -145,7 +147,9 @@ export const gitLabJenkinsBasicTests = (softwareTemplateName: string, stringOnRo
             await jenkinsClient.buildJenkinsJobInFolder(repositoryName, repositoryName);
             console.log('Waiting for the build to start...');
             await new Promise(resolve => setTimeout(resolve, 5000));
-            await jenkinsClient.waitForJobToFinishInFolder(repositoryName, 2, 540000, repositoryName);
+            const jobStatus = await jenkinsClient.waitForJobToFinishInFolder(repositoryName, 2, 540000, repositoryName);
+            expect(jobStatus).not.toBe(undefined);
+            expect(jobStatus).toBe("SUCCESS");
         }, 600000);
 
         /**
