@@ -5,7 +5,7 @@ import { generateRandomChars } from '../../../../src/utils/generator';
 import { GitHubProvider } from "../../../../src/apis/scm-providers/github";
 import { JenkinsCI } from "../../../../src/apis/ci/jenkins";
 import { Kubernetes } from "../../../../src/apis/kubernetes/kube";
-import { checkComponentSyncedInArgoAndRouteIsWorking, checkEnvVariablesGitHub, cleanAfterTestGitHub, createTaskCreatorOptionsGitHub, getDeveloperHubClient, getGitHubClient, getJenkinsCI, getRHTAPGitopsNamespace, getRHTAPRHDHNamespace, getRHTAPRootNamespace, setSecretsForJenkinsInFolder, setSecretsForJenkinsInFolderForTPA, waitForComponentCreation} from "../../../../src/utils/test.utils";
+import { checkComponentSyncedInArgoAndRouteIsWorking, checkEnvVariablesGitHub, checkSBOMInTrustification, cleanAfterTestGitHub, createTaskCreatorOptionsGitHub, getDeveloperHubClient, getGitHubClient, getJenkinsCI, getRHTAPGitopsNamespace, getRHTAPRHDHNamespace, getRHTAPRootNamespace, setSecretsForJenkinsInFolder, setSecretsForJenkinsInFolderForTPA, waitForComponentCreation} from "../../../../src/utils/test.utils";
 
 /**
  * 1. Components get created in Red Hat Developer Hub
@@ -118,6 +118,12 @@ export const gitHubJenkinsPromotionTemplateTests = (gptTemplate: string, stringO
             expect(await gitHubClient.createAgentCommit(githubOrganization, repositoryName + "-gitops")).not.toBe(undefined);
             expect(await gitHubClient.enableACSJenkins(githubOrganization, repositoryName)).not.toBe(undefined);
             expect(await gitHubClient.enableACSJenkins(githubOrganization, repositoryName + "-gitops")).not.toBe(undefined);
+            expect(await gitHubClient.createRegistryUserCommit(githubOrganization, repositoryName)).not.toBe(undefined);
+            expect(await gitHubClient.createRegistryUserCommit(githubOrganization, repositoryName + "-gitops")).not.toBe(undefined);
+            expect(await gitHubClient.createRegistryPasswordCommit(githubOrganization, repositoryName)).not.toBe(undefined);
+            expect(await gitHubClient.createRegistryPasswordCommit(githubOrganization, repositoryName + "-gitops")).not.toBe(undefined);
+            expect(await gitHubClient.disableQuayCommit(githubOrganization, repositoryName)).not.toBe(undefined);
+            expect(await gitHubClient.disableQuayCommit(githubOrganization, repositoryName + "-gitops")).not.toBe(undefined);
             expect(await gitHubClient.updateRekorHost(githubOrganization, repositoryName, await kubeClient.getRekorServerUrl(RHTAPRootNamespace))).not.toBe(undefined);
             expect(await gitHubClient.updateRekorHost(githubOrganization, repositoryName + "-gitops", await kubeClient.getRekorServerUrl(RHTAPRootNamespace))).not.toBe(undefined);
             expect(await gitHubClient.updateTUFMirror(githubOrganization, repositoryName, await kubeClient.getTUFUrl(RHTAPRootNamespace))).not.toBe(undefined);
@@ -292,6 +298,15 @@ export const gitHubJenkinsPromotionTemplateTests = (gptTemplate: string, stringO
          */
         it('container component is successfully synced by gitops in prod environment', async () => {
             await checkComponentSyncedInArgoAndRouteIsWorking(kubeClient, backstageClient, prodNamespace, productionEnvironmentName, repositoryName, stringOnRoute);
+        }, 900000);
+
+        /*
+        * Verifies if the SBOm is uploaded in RHTPA/Trustification
+        */
+        it('check sbom uploaded in RHTPA', async () => {
+            const buildLog = await jenkinsClient.getJobConsoleLogForBuild(repositoryName, repositoryName, 2);
+            const sbomVersion = await jenkinsClient.parseSbomVersionFromConsoleLog(buildLog);
+            await checkSBOMInTrustification(kubeClient, sbomVersion);
         }, 900000);
 
         /**

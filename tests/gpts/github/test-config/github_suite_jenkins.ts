@@ -109,6 +109,9 @@ export const gitHubJenkinsBasicGoldenPathTemplateTests = (gptTemplate: string, s
          */
         it(`Commit updated agent ${gptTemplate} and enable ACS scan`, async () => {
             expect(await gitHubClient.createAgentCommit(githubOrganization, repositoryName)).not.toBe(undefined);
+            expect(await gitHubClient.createRegistryUserCommit(githubOrganization, repositoryName)).not.toBe(undefined);
+            expect(await gitHubClient.createRegistryPasswordCommit(githubOrganization, repositoryName)).not.toBe(undefined);
+            expect(await gitHubClient.disableQuayCommit(githubOrganization, repositoryName)).not.toBe(undefined);
             expect(await gitHubClient.enableACSJenkins(githubOrganization, repositoryName)).not.toBe(undefined);
             expect(await gitHubClient.updateRekorHost(githubOrganization, repositoryName, await kubeClient.getRekorServerUrl(RHTAPRootNamespace))).not.toBe(undefined);
             expect(await gitHubClient.updateTUFMirror(githubOrganization, repositoryName, await kubeClient.getTUFUrl(RHTAPRootNamespace))).not.toBe(undefined);

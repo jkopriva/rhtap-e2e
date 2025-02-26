@@ -502,10 +502,12 @@ export async function verifyPipelineRunByRepository(kubeClient: Kubernetes, repo
 
 export async function setSecretsForJenkinsInFolder(jenkinsClient: JenkinsCI, kubeClient: Kubernetes, folderName: string, isGitLab = false) {
     if (isGitLab){
-        await jenkinsClient.createCredentialsInFolder("GLOBAL", "GITOPS_AUTH_USERNAME", 'fakseUsername', folderName);
+        await jenkinsClient.createCredentialsInFolder("GLOBAL", "GITOPS_AUTH_USERNAME", 'fakeUsername', folderName);
         await jenkinsClient.createCredentialsInFolder("GLOBAL", "GITOPS_AUTH_PASSWORD", process.env.GITLAB_TOKEN ?? '', folderName);
+        await jenkinsClient.createCredentialsUsernamePasswordInFolder("GLOBAL", "GITOPS_CREDENTIALS", "fakeUsername",process.env.GITLAB_TOKEN ?? '', folderName);
     } else {
         await jenkinsClient.createCredentialsInFolder("GLOBAL", "GITOPS_AUTH_PASSWORD", process.env.GITHUB_TOKEN ?? '', folderName);
+        await jenkinsClient.createCredentialsUsernamePasswordInFolder("GLOBAL", "GITOPS_CREDENTIALS", "fakeUsername",process.env.GITHUB_TOKEN ?? '', folderName);
     }
     await jenkinsClient.createCredentialsInFolder("GLOBAL", "COSIGN_PUBLIC_KEY", process.env.COSIGN_PUBLIC_KEY ?? '', folderName);
     await jenkinsClient.createCredentialsInFolder("GLOBAL", "COSIGN_SECRET_KEY", process.env.COSIGN_SECRET_KEY ?? '', folderName);
