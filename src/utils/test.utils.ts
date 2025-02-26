@@ -510,7 +510,8 @@ export async function setSecretsForJenkinsInFolder(jenkinsClient: JenkinsCI, kub
     await jenkinsClient.createCredentialsInFolder("GLOBAL", "COSIGN_PUBLIC_KEY", process.env.COSIGN_PUBLIC_KEY ?? '', folderName);
     await jenkinsClient.createCredentialsInFolder("GLOBAL", "COSIGN_SECRET_KEY", process.env.COSIGN_SECRET_KEY ?? '', folderName);
     await jenkinsClient.createCredentialsInFolder("GLOBAL", "COSIGN_SECRET_PASSWORD", process.env.COSIGN_SECRET_PASSWORD ?? '', folderName);
-    await jenkinsClient.createCredentialsUsernamePasswordInFolder("GLOBAL", "QUAY_IO_CREDS", process.env.IMAGE_REGISTRY_USERNAME ?? '', process.env.IMAGE_REGISTRY_PASSWORD ?? '', folderName);
+    await jenkinsClient.createCredentialsInFolder("GLOBAL", "IMAGE_REGISTRY_USER", process.env.IMAGE_REGISTRY_USERNAME ?? '', folderName);
+    await jenkinsClient.createCredentialsInFolder("GLOBAL", "IMAGE_REGISTRY_PASSWORD", process.env.IMAGE_REGISTRY_PASSWORD ?? '', folderName);
     await jenkinsClient.createCredentialsInFolder("GLOBAL", "ROX_API_TOKEN", await kubeClient.getACSToken(await getRHTAPRootNamespace()), folderName);
     await jenkinsClient.createCredentialsInFolder("GLOBAL", "ROX_CENTRAL_ENDPOINT", await kubeClient.getACSEndpoint(await getRHTAPRootNamespace()), folderName);
 }

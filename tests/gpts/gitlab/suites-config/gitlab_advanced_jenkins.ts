@@ -123,6 +123,15 @@ export const gitLabJenkinsAdvancedTests = (softwareTemplateName: string, stringO
             await gitLabProvider.enableACSJenkins(gitlabRepositoryID, 'main');
             await gitLabProvider.enableACSJenkins(gitlabGitOpsRepositoryID, 'main');
 
+            await gitLabProvider.createRegistryUserCommit(gitlabRepositoryID, 'main');
+            await gitLabProvider.createRegistryUserCommit(gitlabGitOpsRepositoryID, 'main');
+
+            await gitLabProvider.createRegistryPasswordCommit(gitlabRepositoryID, 'main');
+            await gitLabProvider.createRegistryPasswordCommit(gitlabGitOpsRepositoryID, 'main');
+
+            await gitLabProvider.disableQuayCommit(gitlabRepositoryID, 'main');
+            await gitLabProvider.disableQuayCommit(gitlabGitOpsRepositoryID, 'main');
+
             await gitLabProvider.updateRekorHost(gitlabRepositoryID, 'main', await kubeClient.getRekorServerUrl(RHTAPRootNamespace));
             await gitLabProvider.updateRekorHost(gitlabGitOpsRepositoryID, 'main', await kubeClient.getRekorServerUrl(RHTAPRootNamespace));
 

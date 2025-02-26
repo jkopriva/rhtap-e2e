@@ -106,6 +106,9 @@ export const gitLabJenkinsBasicTests = (softwareTemplateName: string, stringOnRo
         it(`Commit updated agent ${softwareTemplateName} and enable ACS scan`, async () => {
             await gitLabProvider.updateJenkinsfileAgent(gitlabRepositoryID, 'main');
             await gitLabProvider.createUsernameCommit(gitlabRepositoryID, 'main');
+            await gitLabProvider.createRegistryUserCommit(gitlabRepositoryID, 'main');
+            await gitLabProvider.createRegistryPasswordCommit(gitlabRepositoryID, 'main');
+            await gitLabProvider.disableQuayCommit(gitlabRepositoryID, 'main');
             await gitLabProvider.enableACSJenkins(gitlabRepositoryID, 'main');
             await gitLabProvider.updateRekorHost(gitlabRepositoryID, 'main', await kubeClient.getRekorServerUrl(RHTAPRootNamespace));
             await gitLabProvider.updateTufMirror(gitlabRepositoryID, 'main', await kubeClient.getTUFUrl(RHTAPRootNamespace));
