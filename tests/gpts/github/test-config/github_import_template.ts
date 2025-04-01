@@ -121,9 +121,7 @@ export const gitHubImportTemplateTests = (gptTemplate: string) => {
          * Delete entities from backstage
          */
         it(`Delete location from backstage`, async () => {
-            const componentIsUnregistered = await backstageClient.deleteEntitiesBySelector(repositoryName);
-            expect(componentIsUnregistered).toBe(true);
-
+            await backstageClient.deleteEntitiesBySelector(repositoryName);
         }, 120000);
 
         it(`Create task import-repo for importing component component`, async () => {

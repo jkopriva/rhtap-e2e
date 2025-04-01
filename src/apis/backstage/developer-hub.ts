@@ -136,26 +136,28 @@ export class DeveloperHubClient extends Utils {
         return false;
     }
 
-    public async unregisterComponentById(id: string) {
+    public async unregisterComponentById(id: string) : Promise<boolean>{
         try {
             const response = await this.axiosInstance.delete(`${this.RHDHUrl}/api/catalog/entities/by-uid/${id}`);
 
             if (response.status === 204) {
                 console.log("Component ID:" + id + " deleted successfully");
+                return true;
             } else {
                 console.log('Failed to delete component:', response.status, response.statusText);
+                return false;
             }
         } catch (error) {
             console.error('Error deleting component:', error);
         }
+        return false;
     }
 
     public async unregisterComponentByName(name: string): Promise<boolean> {
         const componentId = await this.getComponentUid(name);
         if (componentId) {
             console.log("Component ID:" + componentId + " to be deleted");
-            await this.unregisterComponentById(componentId);
-            return true;
+            return await this.unregisterComponentById(componentId);
         }
         return false;
     }
@@ -192,12 +194,13 @@ export class DeveloperHubClient extends Utils {
             const entities = response.data;
             if (entities.length > 0) {
                 let i = 0;
+                let returnStatement  = true;
                 for (i; i < entities.length; i++) {
                     const entity = entities[i];
                     console.log(entity);
-                    await this.unregisterComponentById(entity.metadata.uid);
+                    returnStatement = returnStatement && await this.unregisterComponentById(entity.metadata.uid);
                 }
-                return true;
+                return returnStatement;
             } else {
                 console.log('Component not found');
                 return false;
@@ -215,18 +218,12 @@ export class DeveloperHubClient extends Utils {
 
             if (filteredEntities.length === 0) {
                 console.log(`No components found in catalog with the description containing "${name}".`);
+                return false;
             }
-
-            const entities = filteredEntities;
-            if (entities.length > 0) {
-                let i = 0;
-                for (i; i < entities.length; i++) {
-                    const entity = entities[i];
-                    await this.unregisterComponentById(entity.metadata.uid);
-                }
+            const results = await Promise.all(filteredEntities.map(entity => this.unregisterComponentById(entity.metadata.uid)));
+            if (results.every(r => r === true)) {
                 return true;
             } else {
-                console.log('Component not found');
                 return false;
             }
         } catch (error) {
