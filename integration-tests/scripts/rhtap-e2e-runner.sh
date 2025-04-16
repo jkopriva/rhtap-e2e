@@ -91,7 +91,7 @@ configure_gitlab_variables() {
     export GITLAB_ORGANIZATION_PUBLIC="$(get_secret_value "rhtap" "rhtap-gitlab-integration" "group")"
     export GITLAB_TOKEN="$(get_secret_value "rhtap" "rhtap-gitlab-integration" "token")"
     
-    log "INFO" "GitLab credentials configured successfully (organization: ${GITLAB_ORGANIZATION})"
+    log "INFO" "GitLab credentials configured successfully (organization: ${GITLAB_ORGANIZATION_PUBLIC})"
 }
 
 configure_bitbucket_variables() {
